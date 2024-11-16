@@ -1,52 +1,35 @@
 import 'export.dart';
+import 'ihm/graphique.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp, // Empêche l'orientation paysage
   ]).then((_) {
-    runApp(const MyScanner());
+    runApp(const MyAvocados());
   });
 }
 
-class MyScanner extends StatelessWidget {
-  const MyScanner({super.key});
+class MyAvocados extends StatelessWidget {
+  const MyAvocados({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: "Scanner",
+      title: "First App",
       home: Scaffold(
         body: Stack(
           children: [
-            // Image de fond
-            Center(
-              child: Container(
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage("assets/fond_violet.jpeg"),
-                    fit: BoxFit.cover, // Coupe l'image et la centre
-                  ),
+            Container(
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(
+                      "assets/accueil.jpg"), // Mets une image de fond
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
-            // Image superposée
-            Center(
-              child: Transform.translate(
-                offset: const Offset(0, 8), // 50 pixels vers le bas
-                child: Container(
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                      image:
-                          AssetImage("assets/nmap_logo.png"), // Deuxième image
-                      fit: BoxFit.contain, // Affiche l'image sans la déformer
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            // Widget Scan ou autres widgets
-            const Scan(),
+            const Elevage(),
           ],
         ),
       ),
