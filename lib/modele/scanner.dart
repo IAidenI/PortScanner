@@ -37,7 +37,7 @@ class Scanner {
 
       bool isOpen = await isPortOpen(ipAddress, port);
       if (isOpen) {
-        setPortOpen("Port $port : OUVERT\n");
+        setPortOpen("Port $port : OPEN");
       }
     }
 
@@ -116,7 +116,7 @@ class Scanner {
       }
       bool isOpen = await isPortOpen(ipAddress, port);
       if (isOpen) {
-        setPortOpen("Port $port : OUVERT\n");
+        setPortOpen("Port $port : OPEN");
       }
     }
   }
@@ -129,7 +129,7 @@ class Scanner {
       }
       bool isOpen = await isPortOpen(ipAddress, port);
       if (isOpen) {
-        setPortOpen("Port $port : OUVERT\n");
+        setPortOpen("Port $port : OPEN");
       }
     }
   }
@@ -251,9 +251,6 @@ class Scanner {
 
   static Future<void> _scanBalayageSegment(
       List<String> ipStart, int start, int end) async {
-    int total = end - start + 1;
-    int nextUpdate = 10; // Pourcentage pour la prochaine mise à jour
-
     for (int i = start; i <= end; i++) {
       if (_cancelRequest) {
         // Si une annulation est demandée, on sort de la boucle

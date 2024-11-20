@@ -11,14 +11,15 @@ class _ScanState extends State<Scan> {
   bool isMenu = true;
   bool isScanning = false;
   bool showInfo = false;
-  bool useCommonPort = false;
+  bool useCommonPort = true;
   String ipAddress = "192.168.194.4";
   int subNetMask = 24;
   String url = "https://www.google.com/";
   int portStart = 0;
   int portEnd = 65535;
   int segments = 20;
-  List<String> dataToPrint = [];
+  List<String> portOpen = [];
+  List<String> ipPresent = [];
   Device phone = Device();
   String scanType = "";
 
@@ -614,7 +615,8 @@ class _ScanState extends State<Scan> {
     );
   }
 
-  Future<void> _showAlreadyPresentDialog(Future<void> Function() onNew) async {
+  Future<void> _showAlreadyPresentDialog(
+      Future<void> Function() onNew, String functionName) async {
     await showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -627,7 +629,11 @@ class _ScanState extends State<Scan> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                dataToPrint.clear();
+                if (functionName == "_showListIpDialog") {
+                  ipPresent.clear();
+                } else if (functionName == "_showIpPortDialog") {
+                  portOpen.clear();
+                }
                 Scanner.clear();
                 Scanner.resetCancelRequest();
                 onNew();
@@ -640,6 +646,11 @@ class _ScanState extends State<Scan> {
                 setState(() {
                   isMenu = false;
                   showInfo = true;
+                  if (functionName == "_showIpPortDialog") {
+                    scanType = "ipPort";
+                  } else if (functionName == "_showListIpDialog") {
+                    scanType = "listIp";
+                  }
                 });
               },
               child: const Text("Afficher"),
@@ -670,8 +681,8 @@ class _ScanState extends State<Scan> {
 
     setState(() {
       isScanning = false;
-      dataToPrint = Scanner.getPortOpen();
-      dataToPrint = dataToPrint.toSet().toList();
+      portOpen = Scanner.getPortOpen();
+      portOpen = portOpen.toSet().toList();
       showInfo = true;
     });
   }
@@ -696,8 +707,8 @@ class _ScanState extends State<Scan> {
 
       setState(() {
         isScanning = false;
-        dataToPrint = Scanner.getIpPresent();
-        dataToPrint = dataToPrint.toSet().toList();
+        ipPresent = Scanner.getIpPresent();
+        ipPresent = ipPresent.toSet().toList();
         showInfo = true;
       });
     }
@@ -719,8 +730,9 @@ class _ScanState extends State<Scan> {
                   children: [
                     ElevatedButton(
                       onPressed: () async {
-                        if (dataToPrint.isNotEmpty) {
-                          _showAlreadyPresentDialog(_showListIpDialog);
+                        if (ipPresent.isNotEmpty) {
+                          _showAlreadyPresentDialog(
+                              _showListIpDialog, "_showListIpDialog");
                         } else {
                           _showListIpDialog();
                         }
@@ -730,8 +742,9 @@ class _ScanState extends State<Scan> {
                     const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () async {
-                        if (dataToPrint.isNotEmpty) {
-                          _showAlreadyPresentDialog(_showIpPortDialog);
+                        if (portOpen.isNotEmpty) {
+                          _showAlreadyPresentDialog(
+                              _showIpPortDialog, "_showIpPortDialog");
                         } else {
                           _showIpPortDialog();
                         }
@@ -848,30 +861,53 @@ class _ScanState extends State<Scan> {
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
-                                      children: dataToPrint.isNotEmpty
-                                          ? dataToPrint
-                                              .map((port) => Text(
-                                                    port,
-                                                    style: const TextStyle(
+                                      children: scanType == "ipPort"
+                                          ? (portOpen.isNotEmpty
+                                              ? portOpen
+                                                  .map((port) => Text(
+                                                        port,
+                                                        style: const TextStyle(
+                                                          color: Colors.black87,
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                        ),
+                                                      ))
+                                                  .toList()
+                                              : [
+                                                  const Text(
+                                                    "Aucun port ouvert.",
+                                                    style: TextStyle(
                                                       color: Colors.black87,
                                                       fontSize: 14,
                                                       fontWeight:
                                                           FontWeight.w500,
                                                     ),
-                                                  ))
-                                              .toList()
-                                          : [
-                                              Text(
-                                                scanType == "ipPort"
-                                                    ? "Aucun port ouvert."
-                                                    : "Aucune IP trouvée.",
-                                                style: const TextStyle(
-                                                  color: Colors.black87,
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ],
+                                                  ),
+                                                ])
+                                          : (ipPresent.isNotEmpty
+                                              ? ipPresent
+                                                  .map((ip) => Text(
+                                                        ip,
+                                                        style: const TextStyle(
+                                                          color: Colors.black87,
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                        ),
+                                                      ))
+                                                  .toList()
+                                              : [
+                                                  const Text(
+                                                    "Aucune IP trouvée.",
+                                                    style: TextStyle(
+                                                      color: Colors.black87,
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ]),
                                     ),
                                   ),
                                 ),
@@ -910,7 +946,6 @@ class _ScanState extends State<Scan> {
                 setState(() {
                   isMenu = true;
                   Scanner.cancelScan();
-                  //dataToPrint.clear();
                   Scanner.clear();
                 });
               },

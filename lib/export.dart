@@ -11,6 +11,11 @@ export 'dart:async';
 
 // My packages
 export 'ihm/graphique.dart';
+export 'ihm/background.dart';
+export 'ihm/content.dart';
+export 'ihm/menu.dart';
+export 'ihm/popup.dart';
+
 export 'modele/scanner.dart';
 export 'modele/device.dart';
 export 'modele/checker.dart';
